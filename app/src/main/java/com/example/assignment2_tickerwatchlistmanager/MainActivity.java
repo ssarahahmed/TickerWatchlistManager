@@ -7,18 +7,38 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnTickerSelectedListener{
+
+    FragmentManager fg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        if (savedInstanceState == null) {
+            fg = getSupportFragmentManager();
+            FragmentTransaction trans = fg.beginTransaction();
+
+            TickerListFragment listFrag = new TickerListFragment();
+            trans.add(R.id.listFragment, listFrag, "listFrag");
+
+            InfoWebFragment infoFrag = new InfoWebFragment();
+            trans.add(R.id.infoFragment, infoFrag, "infoFrag");
+
+            trans.commit();
+        }
+
+    }
+
+    @Override
+    public void onTickerSelected(String ticker) {
+        // Find the info fragment by tag and call its load method
+        InfoWebFragment infoFrag = (InfoWebFragment) getSupportFragmentManager().findFragmentByTag("infoFrag");
+        if (infoFrag != null) {
+            infoFrag.loadTicker(ticker);
+        }
     }
 }
