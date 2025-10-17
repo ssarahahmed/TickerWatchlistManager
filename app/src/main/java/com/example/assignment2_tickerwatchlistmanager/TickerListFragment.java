@@ -17,6 +17,7 @@ public class TickerListFragment extends Fragment {
 
     private OnTickerSelectedListener listener;
     private ArrayList<String> tickers;
+    private ArrayAdapter<String> adapter;
 
     private static final String KEY_TICKERS = "tickers_key";
 
@@ -33,6 +34,7 @@ public class TickerListFragment extends Fragment {
         }
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,14 +49,15 @@ public class TickerListFragment extends Fragment {
         }
     }
 
-        @Override
+
+    @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.fragment_ticker_list, container, false);
 
             ListView listView = view.findViewById(R.id.tickerListView);
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, tickers);
-            listView.setAdapter(adapter);
+         adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, tickers);
+        listView.setAdapter(adapter);
 
 
             listView.setOnItemClickListener((parent, itemView, position, id) -> {
@@ -65,4 +68,20 @@ public class TickerListFragment extends Fragment {
 
             return view;
         }
+
+    public void addTicker(String ticker) {
+        if (!tickers.contains(ticker)) {
+            if (tickers.size() < 6) {
+                tickers.add(ticker);
+            } else {
+                tickers.set(5, ticker);
+            }
+            adapter.notifyDataSetChanged();
+        }
     }
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putStringArrayList(KEY_TICKERS, tickers);
+    }
+}
